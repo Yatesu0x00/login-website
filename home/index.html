@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang=de">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login Service</title>
+        <style>
+            #body{
+                margin: 0;
+                padding: 0;
+                background: url(bgd.jpg);
+                background-size: unset;
+                background-position: unset;
+                font-family: sans-serif;
+            }
+
+            ::placeholder{
+                color: #ffffff;
+            }
+
+            h1{
+                margin: 0;
+                padding: 0 0 20px;
+                font-weight: bold;
+                color: #ecd552;
+            }
+
+            .loginbox{
+                width: 320px;
+                height: 420px;
+                background: rgba(0,0,0,0.5);
+                color: #ffffff;
+                transform: translate(-50%, -50%);
+                box-sizing: border-box;
+                padding: 40px 30px;
+                border-radius: 20px;                
+            }
+
+            .loginbox p{
+                margin: 0;
+                padding: 2px;
+                font-weight: bold;
+                color: #ffffff;
+            }
+            .loginbox input[type=text],
+            .loginbox input[type=password]{
+                border: none;
+                border-bottom: 1px solid #ffffff;
+                padding-bottom: 3px;
+                background-color: transparent;
+                outline: none;
+                height: 30px;
+                color: #ffffff;
+            }
+
+            .loginbox input[type=button]{
+                border: none;
+                height: 20px;
+                outline: none;
+                color: #ffffff;
+                font-size: 15px;
+                background-color: #ecd552;
+                cursor: pointer;
+                border-radius: 20px;
+            }
+
+            .loginbox a{
+                color: violet;
+				text-decoration: underline;
+            }
+
+            #errorbox{
+                background-color: rgba(0,0,0,0.50);
+                width: 150px;
+                border-radius: 20px;
+                padding: 10px;
+            }			
+        </style>
+
+        <script src="lib.js"></script>
+        <script>		            		
+            var nameEl;
+            var psw1El;	
+            var psw2El;
+            var errorbox;
+			var regEls = document.getElementsByClassName("register");
+			var logEls = document.getElementsByClassName("login");			
+            var xhr;
+            var usc; 
+            var reg;
+            //var is_grabbed;
+            //var switchGrab;
+            var offsetX;
+            var offsetY;
+            var frm;           
+
+            var successFunc = function(data)
+            {
+                console.log(data);      
+                if(reg == true)
+                {
+                    if(data == "1")
+                    {                   
+                        errorbox.innerHTML="Name ist nicht verfügbar";
+                        nameEl.style.borderColor = "red";
+                    }
+                    else
+                    {
+                        errorbox.innerHTML="Name ist verfügbar";
+                        nameEl.style.borderColor = "green";
+                    }
+                }                         
+            }
+
+            var errorFunc = function(data)
+            {
+                errorbox.innerHTML="Error!" + data;
+            }
+                
+            //nameEl.addEventListener("input", checkNameFunc);
+
+            var checkNameFunc = function()
+            {
+                xhr = lib.ajaxCreateXhr(successFunc, errorFunc);
+                usc.value = "checkName";
+                lib.ajaxSend(xhr, "database.php", "POST", "name=" + nameEl.value + "&usecase=" + usc.value);
+            }
+
+			function showReg()
+            {		
+                reg = true;
+
+				nameEl.focus();
+				
+				for(var i=0; i<logEls.length; i++){
+					logEls[i].style.display = "none";
+				}
+				
+				for(var j=0; j<regEls.length; j++){
+					regEls[j].style.display = "inline";
+                }
+			}
+			
+			function showLog()
+            {			
+                errorbox.innerHTML="";
+                nameEl.style.borderColor = "white";
+
+                reg = false;
+
+				nameEl.focus();
+				
+				for(var i=0; i<regEls.length; i++){
+					regEls[i].style.display = "none";
+				}
+				
+				for(var j=0; j<logEls.length; j++){
+					logEls[j].style.display = "inline";
+				}				
+			}		
+			
+            window.onload=function()
+            {										               
+                usc = document.getElementById("usecase");
+                nameEl = document.getElementById("name");
+                errorbox = document.getElementById("errorbox");
+                frm = document.getElementById("logIsValid");
+                
+                new lib.DnD(frm, errorbox, 'absolute', '960px', '540px', 'onClick');
+
+                showLog();
+
+                var login = document.getElementById("logLink");
+                login.onclick = showLog;
+                
+                var register = document.getElementById("regLink");
+                register.onclick = showReg;
+
+                nameEl.oninput = checkNameFunc;   
+                
+                //is_grabbed = false;
+
+                //switchGrab = false;
+
+                //errorbox.onmousedown = grab;
+                //errorbox.onmouseup = drop;
+                //errorbox.onclick = grabAndDrop;
+                //document.onmousemove = drag;
+            }
+			
+            function validateLog()
+            {
+                nameEl = document.getElementById("name");
+                psw1El = document.getElementById("psw1");
+                errorbox = document.getElementById("errorbox");
+              
+                if(nameEl.value == "" && psw1El.value == "")
+                {
+                    errorbox.innerHTML="You need to enter something!";
+                    return false;
+                }
+                else if (nameEl.value == "")
+                {
+                    errorbox.innerHTML="Enter your username!";
+                    return false;
+                }
+                else if (psw1El.value == "")
+                {
+                    errorbox.innerHTML="Enter your password!";
+                    return false; 
+                }
+                else
+                {
+                    document.getElementById("usecase").value = "log";
+                    document.getElementById("logIsValid").submit();					
+					return true;
+                }
+            }
+
+            function validateReg()
+            {   
+                nameEl = document.getElementById("name");
+                psw1El = document.getElementById("psw1");
+                errorbox = document.getElementsById("errorbox");
+                psw2El = document.getElementById("psw2");
+                
+                if(nameEl.value == "" && psw1El.value == "" && psw2El.value == "")
+                {
+                    errorbox.innerHTML="You need to enter something!";
+                    return false;
+                }
+                if (nameEl.value == "")
+                {
+                    errorbox.innerHTML="Enter your username!";
+                    return false;
+                }
+                if (psw1El.value == "" && psw2El.value == "")
+                {
+                    errorbox.innerHTML="Enter and confirm your password!";
+                    return false;                   
+                }               
+                if (psw1El.value == "")
+                {
+                    errorbox.innerHTML="Enter your password!";
+                    return false;
+                }
+                if (psw2El.value == "")
+                {
+                    errorbox.innerHTML= "Confirm your password!";
+                    return false;
+                }
+                if(psw1El.value != psw2El.value)
+                {
+                    errorbox.innerHTML="Password must match eachother!";
+                    return false; 
+                }             
+                else
+                {
+                    document.getElementById("usecase").value = "reg";
+                    document.getElementById("logIsValid").submit();					
+					return true;
+                }
+            }
+
+            function reset()
+            {
+                nameEl.value = "";
+                psw1El.value = "";
+                psw2El.value = "";
+            }
+
+            function cancelReg()
+            {
+                showLog();
+            }
+            
+            // function grab(e)
+            // {
+            //     offsetX = e.clientX - parseInt(frm.style.left);
+            //     offsetY = e.clientY - parseInt(frm.style.top);
+
+            //     is_grabbed = true;
+
+            //     e.preventDefault(); // Erforderlich fuer Firefox/Chrome
+            // }
+            
+            // function drop(e)
+            // {
+            //     is_grabbed = false; //false
+            // }
+
+            // function drag(e)
+            // {
+            //     if(is_grabbed || switchGrab)
+            //     {
+            //         frm.style.left = (e.clientX - offsetX).toString() + 'px';
+            //         frm.style.top = (e.clientY - offsetY).toString() + 'px';
+            //     }          
+            // }
+
+            // function grabAndDrop(e)
+            // {
+            //     offsetX = e.clientX - parseInt(frm.style.left);
+            //     offsetY = e.clientY - parseInt(frm.style.top);
+
+            //     if(switchGrab == false)
+            //     {
+            //         switchGrab = true;
+            //     }
+            //     else if(switchGrab == true)
+            //     {
+            //         switchGrab = false;
+            //     }
+
+            //     e.preventDefault(); // Erforderlich fuer Firefox/Chrome
+            // }
+
+		</script>
+    </head>
+
+    <body id="body">
+        <form class="loginbox" id="logIsValid" action="database.php" method="POST" style="position: absolute; left: 960px; top: 540px;">
+            <table>
+                <tr>                    
+                    <td>   
+                        <h1>Login</h1>                    
+                        <p>Username</p>
+                        <input id="name" type="text" name="usr" placeholder="Enter Username" size="15">											
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Password</p>
+                        <input id="psw1" type="password" name="psw1" placeholder="Enter Password" size="15">                       
+                    </td>
+                </tr >
+                <tr class="register">
+                    <td>
+                        <p>Confirm Password</p>
+                        <input id="psw2"type="password" name="psw2" placeholder="Enter Password" size="15">                       
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p></p>
+                        <input class="login" type="button" value="Login" onclick="validateLog()">						
+                        <input class="register" type="button" value="Register" onclick="validateReg()">
+                        <input class="register" type="button" value="Cancel" onclick="cancelReg()">
+                        <input calss="login register" type="button" value="Reset" onclick="reset()">					                       
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p></p>
+                        <a class="login" id="regLink"> Register </a>
+                        <a class="register" id="logLink"> Login </a>
+                    </td> 
+                </tr>
+                <tr>
+                    <td>
+                        <p></p>
+                        <div id="errorbox"></div>
+                    </td>
+                </tr>
+				<div>
+                    <input type= "hidden" id="usecase" name="usecase">
+				</div>
+            </table>        
+        </form>
+    </body>
+</html>
