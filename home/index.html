@@ -163,6 +163,8 @@
             {										               
                 usc = document.getElementById("usecase");
                 nameEl = document.getElementById("name");
+                psw1El = document.getElementById("psw1");
+                psw2El = document.getElementById("psw2");
                 errorbox = document.getElementById("errorbox");
                 frm = document.getElementById("logIsValid");
                 
@@ -189,11 +191,7 @@
             }
 			
             function validateLog()
-            {
-                nameEl = document.getElementById("name");
-                psw1El = document.getElementById("psw1");
-                errorbox = document.getElementById("errorbox");
-              
+            {                 
                 if(nameEl.value == "" && psw1El.value == "")
                 {
                     errorbox.innerHTML="You need to enter something!";
@@ -218,12 +216,7 @@
             }
 
             function validateReg()
-            {   
-                nameEl = document.getElementById("name");
-                psw1El = document.getElementById("psw1");
-                errorbox = document.getElementsById("errorbox");
-                psw2El = document.getElementById("psw2");
-                
+            {          
                 if(nameEl.value == "" && psw1El.value == "" && psw2El.value == "")
                 {
                     errorbox.innerHTML="You need to enter something!";

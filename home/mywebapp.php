@@ -16,7 +16,7 @@
                         background-position: unset;
                     }
                     #error {
-                        color: red;
+                        color: white;
                         font-size:20pt;
                         font-family:arial
                     }
@@ -61,7 +61,7 @@
                         background-position: unset;
                     }
                     #success {
-                        color: blue;
+                        color: white;
                         font-size:20pt;
                         font-family:arial
                     }
@@ -87,94 +87,14 @@
                 </p>
         </html>";
     }
-       
+
     session_start();
 
-    $db = mysqli_connect("localhost", "root", "", "goralewski");
-
-    if (mysqli_connect_errno())
-    {
-        printf("Verbindung fehlgeschlagen: " . mysqli_connect_error());
-        exit();
-    }
-
-    if ($_POST['usecase'] == "log")
-    {
-        $usr = mysqli_real_escape_string($db, $_POST['usr']);
-        $query = "SELECT Password FROM user WHERE Username = '$usr'";
-
-        if(!$res = mysqli_query($db, $query))
-        {
-            printf(error("Fehler: ".mysqli_error($db)));
-            mysqli_close($db);
-            exit();
-        }
-
-        if(!$row = mysqli_fetch_assoc($res)) 
-        {
-            printf(error("Der Benutzer ".$usr." ist nicht in der Datenbank vorhanden"));
-            mysqli_close($db);
-            exit();
-        }
-        else
-        {
-            if(password_verify($_POST['psw1'], $row['Password']))
-            {     
-                $_SESSION['loginSuccess'] = true;
-
-                header('Location: http://localhost/home/mywebapp.php');
-
-                //echo(success("Willkommen " .$usr. ""));
-            }
-            else
-            {
-                echo(error("Das Passwort ist falsch"));
-                mysqli_close($db);
-                exit();
-            }
-        }               
-        mysqli_free_result($res);
-    }
-    else if($_POST['usecase'] == "reg")
-    {
-        $usr = mysqli_real_escape_string($db, $_POST['usr']);
-
-        $query = "SELECT Username FROM user WHERE Username = '$usr'";
-              
-        $pswhash = password_hash($_POST['psw1'], PASSWORD_DEFAULT);
-        $psw = mysqli_real_escape_string($db, $pswhash);
-
-        $res = mysqli_query($db, $query);
-
-        if(!$row = mysqli_fetch_assoc($res))
-        {
-            $query = "INSERT INTO user (Username, Password) VALUES ('$usr', '$psw')";
-            mysqli_query($db, $query);
-            echo(success("Sie haben den Benutzer ".$usr. " erfolgreich angelegt"));
-        }
-        else
-        {
-            echo(error("Der Benutzer ".$usr. " ist schon in der Datenbank vorhanden"));
-        }
-        mysqli_close($db);
-    }   
-    if($_POST['usecase'] == "checkName")
-    {
-        $usr = mysqli_real_escape_string($db, $_POST['name']); 
-          
-        $query = "SELECT count(*) as countTest FROM user WHERE Username = '$usr'";
-
-        $res = mysqli_query($db, $query);
-        $row = mysqli_fetch_assoc($res);
-
-        if($row['countTest'] >= 1)
-        {
-            echo("1");
-            
-        }
-        else
-        {
-            echo("0");
-        }       
-    }
+    if (isset($_SESSION['loginSuccess']) && $_SESSION['loginSuccess']) {
+		printf(success("Anmledung erfolgreich und sie wurden zur Einstiegsseite weitergeleitet"));
+		
+		unset($_SESSION['loginSuccess']);
+	} else {
+		printf(error("Das geht nicht! Sie müssen sich zuerst anmelden"));
+	}
 ?>
